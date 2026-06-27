@@ -29,6 +29,12 @@ lilbot pro audit .
 lilbot pro launch-pack . --output lilbot-launch-pack.md
 ```
 
+Before public promotion, run:
+
+```bash
+python scripts/launch_check.py
+```
+
 ## First Paid Workflow
 
 `lilbot pro audit .` scans a repository and reports:
