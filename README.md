@@ -126,6 +126,8 @@ Paid launch support docs are in [CUSTOMER_TERMS.md](/home/athena/Desktop/lilbot/
 
 Run [scripts/launch_check.py](/home/athena/Desktop/lilbot/scripts/launch_check.py) before public promotion to catch missing launch assets and checkout placeholders. Use [scripts/fulfill_order.py](/home/athena/Desktop/lilbot/scripts/fulfill_order.py) after purchase to generate the customer email, license key, and optional local order ledger.
 
+Use [RELEASE.md](/home/athena/Desktop/lilbot/RELEASE.md) and [CHANGELOG.md](/home/athena/Desktop/lilbot/CHANGELOG.md) before publishing paid builds.
+
 ## First Run Experience
 
 ### `lilbot init`

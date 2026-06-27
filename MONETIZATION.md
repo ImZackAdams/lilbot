@@ -37,6 +37,8 @@ Before public promotion, run:
 python scripts/launch_check.py
 ```
 
+Before publishing a release, follow `RELEASE.md` and update `CHANGELOG.md`.
+
 ## First Paid Workflow
 
 `lilbot pro audit .` scans a repository and reports:
