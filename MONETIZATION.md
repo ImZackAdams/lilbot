@@ -14,14 +14,15 @@ Lilbot is packaged as an open-core CLI product.
 2. Set `LILBOT_CHECKOUT_URL` to that checkout URL in release docs, support snippets, and managed deployments.
 3. Replace the placeholder checkout URL in `site/index.html` before publishing the static sales page.
 4. Review `CUSTOMER_TERMS.md`, `SUPPORT.md`, and `PRIVACY.md` before accepting paid customers.
-5. Run `python scripts/issue_license.py` for each buyer or wire the same key format into your fulfillment system.
-6. Send the buyer their license key and activation command:
+5. Fulfill each buyer with `python scripts/fulfill_order.py --email buyer@example.com --order-id ORDER123`.
+6. For low-level key issuing only, use `python scripts/issue_license.py`.
+7. Send the buyer their license key and activation command:
 
 ```bash
 lilbot license activate <license-key>
 ```
 
-7. Ask the buyer to confirm access:
+8. Ask the buyer to confirm access:
 
 ```bash
 lilbot license status

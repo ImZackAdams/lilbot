@@ -122,7 +122,7 @@ The static sales page lives in [site/index.html](/home/athena/Desktop/lilbot/sit
 
 Paid launch support docs are in [CUSTOMER_TERMS.md](/home/athena/Desktop/lilbot/CUSTOMER_TERMS.md), [SUPPORT.md](/home/athena/Desktop/lilbot/SUPPORT.md), and [PRIVACY.md](/home/athena/Desktop/lilbot/PRIVACY.md).
 
-Run [scripts/launch_check.py](/home/athena/Desktop/lilbot/scripts/launch_check.py) before public promotion to catch missing launch assets and checkout placeholders.
+Run [scripts/launch_check.py](/home/athena/Desktop/lilbot/scripts/launch_check.py) before public promotion to catch missing launch assets and checkout placeholders. Use [scripts/fulfill_order.py](/home/athena/Desktop/lilbot/scripts/fulfill_order.py) after purchase to generate the customer email, license key, and optional local order ledger.
 
 ## First Run Experience
 
