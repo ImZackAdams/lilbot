@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import hmac
 import json
@@ -21,6 +21,7 @@ SUPPORT_EMAIL_ENV_VAR = "LILBOT_SUPPORT_EMAIL"
 DEFAULT_LICENSE_FILENAME = "license.json"
 DEFAULT_PRO_PRICE = "$19/month per seat or $190/year"
 DEFAULT_SUPPORT_EMAIL = "support@example.com"
+DEFAULT_TRIAL_DAYS = 7
 
 
 @dataclass(frozen=True)
@@ -39,7 +40,11 @@ class LicenseStatus:
 
     @property
     def tier_label(self) -> str:
-        return "Pro" if self.active else "Free"
+        if self.active and self.tier == "pro":
+            return "Pro"
+        if self.active and self.tier == "trial":
+            return "Trial"
+        return "Free"
 
 
 def default_license_path() -> Path:
@@ -111,6 +116,15 @@ def load_license_status(path: str | Path | None = None) -> LicenseStatus:
 
     stored_key = _coerce_text(payload.get("license_key"))
     stored_email = _coerce_text(payload.get("email"))
+    trial_status = _evaluate_trial_payload(
+        payload,
+        source=str(license_path),
+        license_path=license_path,
+        checkout_url=checkout_url,
+        support_email=support_email,
+    )
+    if trial_status is not None and not stored_key:
+        return trial_status
     if not stored_key:
         return LicenseStatus(
             tier="free",
@@ -130,6 +144,34 @@ def load_license_status(path: str | Path | None = None) -> LicenseStatus:
         checkout_url=checkout_url,
         support_email=support_email,
     )
+
+
+def start_trial(
+    *,
+    path: str | Path | None = None,
+    days: int = DEFAULT_TRIAL_DAYS,
+) -> LicenseStatus:
+    """Start a local Pro trial if no active Pro license exists."""
+
+    license_path = Path(path).expanduser() if path is not None else default_license_path()
+    current = load_license_status(license_path)
+    if current.active and current.tier == "pro":
+        return current
+    if current.active and current.tier == "trial":
+        return current
+
+    now = datetime.now(timezone.utc)
+    expires_at = now + timedelta(days=max(1, int(days)))
+    values = {
+        "trial_started_at": now.isoformat(),
+        "trial_expires_at": expires_at.isoformat(),
+    }
+    try:
+        license_path.parent.mkdir(parents=True, exist_ok=True)
+        license_path.write_text(json.dumps(values, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    except OSError as exc:
+        raise RuntimeError(f"Could not write Lilbot trial license to {license_path}: {exc}") from exc
+    return load_license_status(license_path)
 
 
 def activate_license_key(
@@ -185,6 +227,7 @@ def render_license_status(status: LicenseStatus | None = None) -> str:
         lines.append(f"- email: {status.email}")
     if not status.active:
         lines.append(f"- upgrade: {_checkout_text(status.checkout_url)}")
+        lines.append("- trial: lilbot license start-trial")
         lines.append("- activate: lilbot license activate <license-key>")
     return "\n".join(lines)
 
@@ -212,6 +255,9 @@ def render_pricing(status: LicenseStatus | None = None) -> str:
         "After purchase",
         "- lilbot license activate <license-key>",
         "- lilbot pro audit .",
+        "",
+        "Trial",
+        f"- lilbot license start-trial gives {DEFAULT_TRIAL_DAYS} days of local Pro access.",
     ]
     if status.active:
         lines.extend(["", "Current license", f"- tier: {status.tier_label}"])
@@ -263,6 +309,54 @@ def _evaluate_license_key(
         license_path=license_path,
         key_fingerprint=_fingerprint_key(formatted),
         email=email,
+        checkout_url=checkout_url,
+        support_email=support_email,
+    )
+
+
+def _evaluate_trial_payload(
+    payload: dict[str, Any],
+    *,
+    source: str,
+    license_path: Path,
+    checkout_url: str | None,
+    support_email: str,
+) -> LicenseStatus | None:
+    expires_text = _coerce_text(payload.get("trial_expires_at"))
+    if not expires_text:
+        return None
+    try:
+        expires_at = datetime.fromisoformat(expires_text)
+    except ValueError:
+        return LicenseStatus(
+            tier="free",
+            active=False,
+            source=source,
+            message="Trial license has an invalid expiration timestamp.",
+            license_path=license_path,
+            checkout_url=checkout_url,
+            support_email=support_email,
+        )
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+    now = datetime.now(timezone.utc)
+    if expires_at <= now:
+        return LicenseStatus(
+            tier="free",
+            active=False,
+            source=source,
+            message=f"Trial expired on {expires_at.date().isoformat()}.",
+            license_path=license_path,
+            checkout_url=checkout_url,
+            support_email=support_email,
+        )
+    return LicenseStatus(
+        tier="trial",
+        active=True,
+        source=source,
+        message=f"Trial is active until {expires_at.date().isoformat()}.",
+        license_path=license_path,
         checkout_url=checkout_url,
         support_email=support_email,
     )

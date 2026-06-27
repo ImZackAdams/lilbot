@@ -225,6 +225,24 @@ class CliTests(unittest.TestCase):
         self.assertIn("Lilbot Pro activated.", text)
         self.assertIn("tier: Pro", text)
 
+    def test_license_start_trial_enables_trial(self) -> None:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with tempfile.TemporaryDirectory() as tempdir:
+            license_path = Path(tempdir) / "license.json"
+            with (
+                patch.dict(os.environ, {"LILBOT_LICENSE_PATH": str(license_path)}, clear=True),
+                redirect_stdout(stdout),
+                redirect_stderr(stderr),
+            ):
+                main(["license", "start-trial"])
+
+            self.assertTrue(license_path.is_file())
+
+        text = stdout.getvalue()
+        self.assertIn("Lilbot Pro trial started.", text)
+        self.assertIn("tier: Trial", text)
+
     def test_pro_audit_command_requires_license(self) -> None:
         stdout = io.StringIO()
         stderr = io.StringIO()

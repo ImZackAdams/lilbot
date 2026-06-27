@@ -26,6 +26,7 @@ lilbot license activate <license-key>
 
 ```bash
 lilbot license status
+lilbot license start-trial
 lilbot pro audit .
 lilbot pro launch-pack . --output lilbot-launch-pack.md
 ```

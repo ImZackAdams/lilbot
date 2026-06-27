@@ -15,5 +15,6 @@ class SiteAssetTests(unittest.TestCase):
         self.assertIn("Lilbot Pro", html)
         self.assertIn("lilbot pro audit .", html)
         self.assertIn("lilbot pro launch-pack", html)
+        self.assertIn("lilbot license start-trial", html)
         self.assertIn("https://example.com/lilbot-pro-checkout", html)
         self.assertIn(".hero", css)

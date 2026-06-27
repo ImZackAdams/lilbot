@@ -15,6 +15,7 @@ The first paid workflow is:
 
 ```bash
 lilbot pricing
+lilbot license start-trial
 lilbot license activate <license-key>
 lilbot pro audit .
 lilbot pro launch-pack . --output lilbot-launch-pack.md
@@ -85,10 +86,11 @@ Lilbot has a built-in purchase and activation path for a paid CLI product.
 ```bash
 lilbot pricing
 lilbot license status
+lilbot license start-trial
 lilbot license activate <license-key>
 ```
 
-Free users keep the existing local assistant, deterministic repo tools, diagnostics, and shell explanation commands. Pro users unlock repository product-readiness audits:
+Free users keep the existing local assistant, deterministic repo tools, diagnostics, and shell explanation commands. Trial and Pro users unlock repository product-readiness audits:
 
 ```bash
 lilbot pro audit .

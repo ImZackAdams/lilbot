@@ -15,6 +15,7 @@ from lilbot.licensing import (
     render_license_status,
     render_pricing,
     render_upgrade_required,
+    start_trial,
 )
 from lilbot.model import build_model
 from lilbot.onboarding import (
@@ -376,6 +377,7 @@ def _run_license_command(parts: list[str]) -> str:
     subparsers = parser.add_subparsers(dest="action", required=True)
 
     subparsers.add_parser("status")
+    subparsers.add_parser("start-trial")
     activate_parser = subparsers.add_parser("activate")
     activate_parser.add_argument("license_key")
     activate_parser.add_argument("--email", default=None)
@@ -383,6 +385,14 @@ def _run_license_command(parts: list[str]) -> str:
     parsed = parser.parse_args(parts)
     if parsed.action == "status":
         return render_license_status(load_license_status())
+    if parsed.action == "start-trial":
+        status = start_trial()
+        return "\n".join(
+            [
+                "Lilbot Pro trial started.",
+                render_license_status(status),
+            ]
+        )
     if parsed.action == "activate":
         try:
             status = activate_license_key(parsed.license_key, email=parsed.email)

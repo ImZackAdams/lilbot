@@ -11,6 +11,7 @@ from lilbot.licensing import (
     activate_license_key,
     load_license_status,
     render_pricing,
+    start_trial,
 )
 
 
@@ -71,3 +72,15 @@ class LicensingTests(unittest.TestCase):
 
         self.assertIn("Lilbot pricing", text)
         self.assertIn("https://billing.example/lilbot-pro", text)
+
+    def test_start_trial_enables_trial_tier(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            license_path = Path(tempdir) / "license.json"
+            with patch.dict(os.environ, {"LILBOT_LICENSE_PATH": str(license_path)}, clear=True):
+                status = start_trial(days=7)
+                loaded = load_license_status()
+
+        self.assertTrue(status.active)
+        self.assertEqual(status.tier_label, "Trial")
+        self.assertTrue(loaded.active)
+        self.assertEqual(loaded.tier, "trial")

@@ -302,6 +302,10 @@ li + li {
   margin-top: auto;
 }
 
+.trial-line {
+  margin: 16px 0 0;
+}
+
 .proof-layout {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
