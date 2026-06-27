@@ -24,6 +24,7 @@ PACKAGE_FILES = {
 }
 README_FILES = {"README", "README.md", "README.rst"}
 LICENSE_FILES = {"LICENSE", "LICENSE.md", "COPYING"}
+PAID_TERMS_FILES = {"CUSTOMER_TERMS.md", "TERMS.md", "COMMERCIAL_TERMS.md"}
 CHANGELOG_FILES = {"CHANGELOG.md", "CHANGELOG", "HISTORY.md"}
 ENV_SAMPLE_FILES = {".env.example", ".env.sample", "example.env"}
 CHECKOUT_TERMS = (
@@ -436,30 +437,47 @@ def _monetization_signal(relative_files: dict[str, Path], text_index: dict[str, 
 
 
 def _license_signal(names: set[str]) -> AuditSignal:
-    if names.intersection(LICENSE_FILES):
+    has_open_license = bool(names.intersection(LICENSE_FILES))
+    has_paid_terms = bool(names.intersection(PAID_TERMS_FILES))
+    if has_open_license and has_paid_terms:
         return AuditSignal(
             "Legal",
             "PASS",
-            "A project license file is present.",
-            "For Pro sales, add customer terms that cover support, refunds, and paid entitlement limits.",
+            "Project license and paid customer terms are present.",
+            "Review paid terms before high-volume sales or enterprise procurement.",
+        )
+    if has_open_license:
+        return AuditSignal(
+            "Legal",
+            "WARN",
+            "A project license file is present, but no paid customer terms were detected.",
+            "Add customer terms that cover support, refunds, and paid entitlement limits.",
         )
     return AuditSignal(
         "Legal",
-        "WARN",
-        "No project license file was detected.",
-        "Add a license file and customer-facing paid terms before broad distribution.",
+        "FAIL",
+        "No project license or paid customer terms were detected.",
+        "Add a project license and customer-facing paid terms before broad distribution.",
     )
 
 
 def _support_signal(lower_paths: set[str], names: set[str]) -> AuditSignal:
     has_support = "support.md" in lower_paths or ".github/issue_template" in lower_paths
+    has_privacy = "PRIVACY.md" in names
     has_docs = any(path.startswith("docs/") for path in lower_paths)
-    if has_support or has_docs or "ROADMAP.md" in names:
+    if has_support and has_privacy:
         return AuditSignal(
             "Support",
             "PASS",
-            "Support, docs, or roadmap assets are present.",
-            "Add a Pro support promise and response-time expectation near checkout.",
+            "Support and privacy notes are present.",
+            "Keep response-time expectations and refund guidance visible near checkout.",
+        )
+    if has_support or has_docs or "ROADMAP.md" in names:
+        return AuditSignal(
+            "Support",
+            "WARN",
+            "Support, docs, or roadmap assets are present, but customer support coverage is incomplete.",
+            "Add support and privacy notes with response-time expectations before paid promotion.",
         )
     return AuditSignal(
         "Support",

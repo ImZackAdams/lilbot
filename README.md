@@ -120,6 +120,8 @@ For the operator launch checklist and manual license fulfillment helper, see [MO
 
 The static sales page lives in [site/index.html](/home/athena/Desktop/lilbot/site/index.html). Replace the placeholder Pro checkout link with your live payment URL before publishing it.
 
+Paid launch support docs are in [CUSTOMER_TERMS.md](/home/athena/Desktop/lilbot/CUSTOMER_TERMS.md), [SUPPORT.md](/home/athena/Desktop/lilbot/SUPPORT.md), and [PRIVACY.md](/home/athena/Desktop/lilbot/PRIVACY.md).
+
 ## First Run Experience
 
 ### `lilbot init`

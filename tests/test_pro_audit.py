@@ -36,6 +36,9 @@ class ProAuditTests(unittest.TestCase):
         )
         (self.workspace / "pyproject.toml").write_text("[project]\nname = 'revenue-tool'\n", encoding="utf-8")
         (self.workspace / "LICENSE").write_text("MIT\n", encoding="utf-8")
+        (self.workspace / "CUSTOMER_TERMS.md").write_text("Paid support and refunds.\n", encoding="utf-8")
+        (self.workspace / "SUPPORT.md").write_text("Support promise.\n", encoding="utf-8")
+        (self.workspace / "PRIVACY.md").write_text("Local-first privacy.\n", encoding="utf-8")
         (self.workspace / ".env.example").write_text("LILBOT_CHECKOUT_URL=\n", encoding="utf-8")
         (self.workspace / "tests").mkdir()
         for index in range(4):
@@ -72,6 +75,8 @@ class ProAuditTests(unittest.TestCase):
         self.assertIn("Lilbot Pro product readiness audit", text)
         self.assertIn("Findings", text)
         self.assertIn("[PASS] Monetization", text)
+        self.assertIn("[PASS] Legal", text)
+        self.assertIn("[PASS] Support", text)
 
     def test_launch_pack_renders_customer_ready_sections(self) -> None:
         config = LilbotConfig.from_sources(workspace_root=self.tempdir.name)
