@@ -17,6 +17,7 @@ from lilbot.config import (
     read_user_config_file,
     save_user_config,
 )
+from lilbot.licensing import load_license_status
 from lilbot.tools import build_default_tool_registry
 
 
@@ -118,6 +119,7 @@ def render_doctor_report(config: LilbotConfig) -> str:
 
     user_config = read_user_config_file(config.user_config_path)
     discovered_model = discover_default_model()
+    license_status = load_license_status()
 
     lines = ["Lilbot doctor", ""]
     lines.extend(
@@ -133,6 +135,8 @@ def render_doctor_report(config: LilbotConfig) -> str:
             f"- max_steps: {config.max_steps}",
             f"- model: {config.model or '(not configured)'}",
             f"- model_status: {_describe_model_status(config.model)}",
+            f"- license_tier: {license_status.tier_label}",
+            f"- license_status: {license_status.message}",
         ]
     )
     if discovered_model and discovered_model != config.model:
@@ -162,6 +166,7 @@ def render_doctor_report(config: LilbotConfig) -> str:
         user_config=user_config,
         package_state=package_state,
         cuda_state=cuda_state,
+        pro_active=license_status.active,
     )
     lines.append("")
     lines.append("Next steps")
@@ -585,6 +590,7 @@ def _doctor_next_steps(
     user_config,
     package_state: dict[str, bool],
     cuda_state: dict[str, object],
+    pro_active: bool,
 ) -> list[str]:
     steps: list[str] = []
 
@@ -620,6 +626,8 @@ def _doctor_next_steps(
         steps.append("Run `lilbot self-test` for a quick pass/warn/fail validation.")
         steps.append("Run `lilbot` to start the interactive assistant.")
         steps.append("Use `lilbot repo summarize .` to try a deterministic command path.")
+        if not pro_active:
+            steps.append("Run `lilbot pricing` to see the paid Pro audit workflow.")
     return steps
 
 

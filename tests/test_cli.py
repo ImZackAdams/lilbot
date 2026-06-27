@@ -10,6 +10,7 @@ from contextlib import redirect_stderr, redirect_stdout
 from unittest.mock import patch
 
 from lilbot.cli import main
+from lilbot.licensing import _license_checksum
 from lilbot.model.base import BaseModel
 from lilbot.onboarding import SelfTestCheck, SelfTestResult
 
@@ -29,6 +30,9 @@ class FakeModel(BaseModel):
 
 
 class CliTests(unittest.TestCase):
+    def _pro_key(self, payload: str = "CLIBUYER202606") -> str:
+        return f"LILBOT-PRO-{payload}-{_license_checksum(payload)}"
+
     def test_one_shot_query_still_works(self) -> None:
         stdout = io.StringIO()
         stderr = io.StringIO()
@@ -183,3 +187,55 @@ class CliTests(unittest.TestCase):
             text = stdout.getvalue()
             self.assertIn("Lilbot is not ready for AI chat yet", text)
             self.assertIn("Deterministic commands", text)
+
+    def test_pricing_command_prints_purchase_path(self) -> None:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with tempfile.TemporaryDirectory() as tempdir:
+            env = {
+                "LILBOT_LICENSE_PATH": str(Path(tempdir) / "license.json"),
+                "LILBOT_CHECKOUT_URL": "https://billing.example/lilbot-pro",
+            }
+            with (
+                patch.dict(os.environ, env, clear=True),
+                redirect_stdout(stdout),
+                redirect_stderr(stderr),
+            ):
+                main(["pricing"])
+
+        text = stdout.getvalue()
+        self.assertIn("Lilbot pricing", text)
+        self.assertIn("https://billing.example/lilbot-pro", text)
+
+    def test_license_activate_command_writes_license(self) -> None:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with tempfile.TemporaryDirectory() as tempdir:
+            license_path = Path(tempdir) / "license.json"
+            with (
+                patch.dict(os.environ, {"LILBOT_LICENSE_PATH": str(license_path)}, clear=True),
+                redirect_stdout(stdout),
+                redirect_stderr(stderr),
+            ):
+                main(["license", "activate", self._pro_key(), "--email", "cli@example.com"])
+
+            self.assertTrue(license_path.is_file())
+
+        text = stdout.getvalue()
+        self.assertIn("Lilbot Pro activated.", text)
+        self.assertIn("tier: Pro", text)
+
+    def test_pro_audit_command_requires_license(self) -> None:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with tempfile.TemporaryDirectory() as tempdir:
+            workspace = Path(tempdir) / "workspace"
+            workspace.mkdir()
+            with (
+                patch.dict(os.environ, {"LILBOT_LICENSE_PATH": str(Path(tempdir) / "license.json")}, clear=True),
+                redirect_stdout(stdout),
+                redirect_stderr(stderr),
+            ):
+                main(["--workspace-root", str(workspace), "pro", "audit", "."])
+
+        self.assertIn("available in Lilbot Pro", stdout.getvalue())

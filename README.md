@@ -6,6 +6,21 @@ It runs a local language model directly inside Python, keeps tool execution unde
 
 Lilbot is not a cloud assistant, not a web app, and not a thin wrapper around a hosted API.
 
+Lilbot now ships as an open-core CLI product:
+
+- Free: local chat, deterministic repository/log/system tools, setup diagnostics, and shell-command explanations
+- Pro: paid product-readiness audits that turn a repository scan into launch, packaging, support, release, and monetization priorities
+
+The first paid workflow is:
+
+```bash
+lilbot pricing
+lilbot license activate <license-key>
+lilbot pro audit .
+```
+
+Set `LILBOT_CHECKOUT_URL` to your Stripe Payment Link, Gumroad product, Lemon Squeezy checkout, Paddle checkout, or billing page before shipping a paid release.
+
 ## Quick Start
 
 From the repository root:
@@ -23,6 +38,7 @@ lilbot init
 lilbot doctor
 lilbot self-test
 lilbot --version
+lilbot pricing
 ```
 
 `lilbot init` is the expected first-run step before chat or free-form AI queries. When it asks for `Local model path`, enter a real local checkpoint path if you want `lilbot` and one-shot prompts to work. If you leave it blank, deterministic commands still work, but chat and free-form prompts will not.
@@ -57,7 +73,45 @@ lilbot repo summarize .
 lilbot repo trace-function authenticate_user .
 lilbot logs analyze /var/log/syslog
 lilbot explain-command "tar -czf backup.tar.gz project/"
+lilbot pro audit .
 ```
+
+## Pricing and Pro
+
+Lilbot has a built-in purchase and activation path for a paid CLI product.
+
+```bash
+lilbot pricing
+lilbot license status
+lilbot license activate <license-key>
+```
+
+Free users keep the existing local assistant, deterministic repo tools, diagnostics, and shell explanation commands. Pro users unlock repository product-readiness audits:
+
+```bash
+lilbot pro audit .
+```
+
+The Pro audit checks for buyer-facing positioning, packaging metadata, onboarding, tests, release assets, checkout/licensing surfaces, support readiness, config hygiene, and safety messaging. It returns a score, findings, launch priorities, and a revenue path.
+
+### Payment Setup
+
+Lilbot does not require a payment-provider SDK inside the CLI. Point the checkout command at the provider you already use:
+
+```bash
+export LILBOT_CHECKOUT_URL="https://your-payment-provider.example/lilbot-pro"
+export LILBOT_SUPPORT_EMAIL="support@example.com"
+```
+
+After checkout, deliver a license key to the customer and ask them to run:
+
+```bash
+lilbot license activate <license-key>
+```
+
+License state is stored locally at `~/.config/lilbot/license.json` by default. Override it with `LILBOT_LICENSE_PATH`, or set `LILBOT_LICENSE_KEY` directly in managed environments.
+
+For the operator launch checklist and manual license fulfillment helper, see [MONETIZATION.md](/home/athena/Desktop/lilbot/MONETIZATION.md).
 
 ## First Run Experience
 
@@ -291,6 +345,10 @@ Common settings:
 - `LILBOT_MAX_NEW_TOKENS`
 - `LILBOT_MAX_STEPS`
 - `LILBOT_CONFIG_PATH`
+- `LILBOT_CHECKOUT_URL`
+- `LILBOT_LICENSE_KEY`
+- `LILBOT_LICENSE_PATH`
+- `LILBOT_SUPPORT_EMAIL`
 
 The sample environment file is in [.env.example](/home/athena/Desktop/lilbot/.env.example).
 

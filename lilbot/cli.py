@@ -9,6 +9,13 @@ import sys
 
 from lilbot.agent import LilbotAgent
 from lilbot.config import LilbotConfig
+from lilbot.licensing import (
+    activate_license_key,
+    load_license_status,
+    render_license_status,
+    render_pricing,
+    render_upgrade_required,
+)
 from lilbot.model import build_model
 from lilbot.onboarding import (
     render_doctor_report,
@@ -17,6 +24,7 @@ from lilbot.onboarding import (
     run_self_test,
 )
 from lilbot.tools import build_default_tool_registry
+from lilbot.tools.pro import render_product_readiness_audit
 from lilbot.utils.logging import StepLogger
 
 
@@ -43,6 +51,9 @@ def build_parser() -> argparse.ArgumentParser:
             "  lilbot init\n"
             "  lilbot doctor\n"
             "  lilbot self-test\n"
+            "  lilbot pricing\n"
+            "  lilbot license status\n"
+            "  lilbot pro audit .\n"
             "  lilbot\n"
             "  lilbot \"why is my system slow?\"\n"
             "  lilbot repo summarize .\n"
@@ -58,7 +69,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "command",
         nargs="?",
-        help="A free-form query or a Lilbot subcommand such as init, doctor, self-test, repo, logs, or explain-command. Omit it to start interactive chat mode.",
+        help="A free-form query or a Lilbot subcommand such as init, doctor, self-test, pricing, license, pro, repo, logs, or explain-command. Omit it to start interactive chat mode.",
     )
     parser.add_argument(
         "--model",
@@ -171,6 +182,15 @@ def main(argv: Sequence[str] | None = None) -> None:
             if exit_code:
                 raise SystemExit(exit_code)
             return
+        if mode == "pricing":
+            print(_run_pricing_command(payload))
+            return
+        if mode == "license":
+            print(_run_license_command(payload))
+            return
+        if mode == "pro":
+            print(_run_pro_command(payload, config))
+            return
     except RuntimeError as exc:
         print(f"Error: {exc}", file=sys.stderr)
         raise SystemExit(1) from exc
@@ -183,9 +203,9 @@ def _resolve_mode(
     command: str | None,
     extras: list[str],
 ) -> tuple[str, list[str]]:
-    if command in {"repo", "logs", "explain-command", "doctor", "init", "self-test"}:
+    if command in {"repo", "logs", "explain-command", "doctor", "init", "self-test", "pricing", "license", "pro"}:
         if not extras:
-            if command in {"doctor", "init", "self-test"}:
+            if command in {"doctor", "init", "self-test", "pricing"}:
                 return command, []
             parser.error(f"{command} requires additional arguments")
         return command, extras
@@ -344,6 +364,52 @@ def _run_self_test_command(parts: list[str], config: LilbotConfig) -> tuple[str,
     return render_self_test_report(result), result.exit_code
 
 
+def _run_pricing_command(parts: list[str]) -> str:
+    if parts:
+        raise SystemExit("pricing does not accept additional arguments")
+    return render_pricing(load_license_status())
+
+
+def _run_license_command(parts: list[str]) -> str:
+    parser = argparse.ArgumentParser(prog="lilbot license")
+    subparsers = parser.add_subparsers(dest="action", required=True)
+
+    subparsers.add_parser("status")
+    activate_parser = subparsers.add_parser("activate")
+    activate_parser.add_argument("license_key")
+    activate_parser.add_argument("--email", default=None)
+
+    parsed = parser.parse_args(parts)
+    if parsed.action == "status":
+        return render_license_status(load_license_status())
+    if parsed.action == "activate":
+        try:
+            status = activate_license_key(parsed.license_key, email=parsed.email)
+        except ValueError as exc:
+            raise SystemExit(f"Invalid license: {exc}") from exc
+        return "\n".join(
+            [
+                "Lilbot Pro activated.",
+                render_license_status(status),
+            ]
+        )
+    raise SystemExit(f"Unsupported license action: {parsed.action}")
+
+
+def _run_pro_command(parts: list[str], config: LilbotConfig) -> str:
+    parser = argparse.ArgumentParser(prog="lilbot pro")
+    parser.add_argument("action", choices=("audit",))
+    parser.add_argument("path", nargs="?", default=".")
+    parsed = parser.parse_args(parts)
+
+    status = load_license_status()
+    if not status.active:
+        return render_upgrade_required("Product readiness audit", status)
+    if parsed.action == "audit":
+        return render_product_readiness_audit(config, parsed.path)
+    raise SystemExit(f"Unsupported pro action: {parsed.action}")
+
+
 def _emit_config_diagnostics(config: LilbotConfig) -> None:
     if config.user_config_error:
         print(
@@ -391,6 +457,7 @@ def _chat_status_text(
         [
             f"Model: {_model_location(model, config)}",
             f"Runtime: {_runtime_mode_text(model, config)}",
+            f"Plan: {load_license_status().tier_label}",
             f"Workspace: {config.workspace_root}",
             f"Config: {config.user_config_path}",
             f"Tools: {len(getattr(registry, 'names', lambda: [])())}",

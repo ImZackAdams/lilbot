@@ -5,6 +5,7 @@ from __future__ import annotations
 from lilbot.config import LilbotConfig
 from lilbot.tools.filesystem import ListDirectoryTool, ReadFileTool
 from lilbot.tools.logs import SummarizeLogTool
+from lilbot.tools.pro import ProductReadinessAuditTool
 from lilbot.tools.registry import ToolRegistry
 from lilbot.tools.repo import FindFunctionTool, SummarizeRepoTool
 from lilbot.tools.shell import RunShellTool
@@ -19,6 +20,7 @@ def build_default_tool_registry(config: LilbotConfig) -> ToolRegistry:
             RunShellTool(config),
             SummarizeRepoTool(config),
             FindFunctionTool(config),
+            ProductReadinessAuditTool(config),
             SummarizeLogTool(config),
             InspectSystemTool(config),
             DiskUsageTool(config),

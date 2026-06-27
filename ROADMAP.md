@@ -10,10 +10,14 @@ Lilbot is already usable as a local AI CLI, but the next phase is about making i
 - persistent per-user config
 - interactive slash commands
 - clearer onboarding docs
+- Free/Pro packaging with `lilbot pricing`, `lilbot license`, and `lilbot pro audit`
+- repository product-readiness audits as the first paid workflow
 
 ## Near Term
 
 - package and publish clean install paths for `pipx`, `venv`, and `conda`
+- connect `LILBOT_CHECKOUT_URL` to the live payment provider for public launches
+- add a private release checklist for issuing and supporting Pro license keys
 - improve model-load error messages with more actionable fix suggestions
 - add clearer progress output during long model loads and tool runs
 - expand REPL quality-of-life features like command history and better interrupt handling
@@ -28,6 +32,7 @@ Lilbot is already usable as a local AI CLI, but the next phase is about making i
 ## Tooling
 
 - deepen repository inspection tools
+- expand Pro audits into security, dependency, and release-risk modules
 - add better stack-trace and error-log workflows
 - improve system diagnostics beyond the current snapshot tools
 - add safer write-assisted workflows behind explicit confirmation paths
@@ -41,6 +46,7 @@ Lilbot is already usable as a local AI CLI, but the next phase is about making i
 ## UX and Documentation
 
 - add an asciinema or demo GIF
+- add paid onboarding screenshots and a checkout-to-activation walkthrough
 - publish hardware-specific setup guides
 - add a troubleshooting matrix by symptom
 - improve the quickstart for first-time Linux users
