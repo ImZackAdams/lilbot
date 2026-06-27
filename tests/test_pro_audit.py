@@ -9,6 +9,7 @@ from unittest.mock import patch
 from lilbot.config import LilbotConfig
 from lilbot.licensing import _license_checksum
 from lilbot.tools import build_default_tool_registry
+from lilbot.tools.pro import render_launch_pack
 
 
 def pro_key(payload: str = "AUDITBUYER202606") -> str:
@@ -71,3 +72,13 @@ class ProAuditTests(unittest.TestCase):
         self.assertIn("Lilbot Pro product readiness audit", text)
         self.assertIn("Findings", text)
         self.assertIn("[PASS] Monetization", text)
+
+    def test_launch_pack_renders_customer_ready_sections(self) -> None:
+        config = LilbotConfig.from_sources(workspace_root=self.tempdir.name)
+
+        text = render_launch_pack(config, ".")
+
+        self.assertIn("# Revenue Tool Launch Pack", text)
+        self.assertIn("## Paid Offer", text)
+        self.assertIn("## Fulfillment Email", text)
+        self.assertIn("lilbot pro launch-pack", text)

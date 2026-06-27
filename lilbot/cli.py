@@ -24,7 +24,7 @@ from lilbot.onboarding import (
     run_self_test,
 )
 from lilbot.tools import build_default_tool_registry
-from lilbot.tools.pro import render_product_readiness_audit
+from lilbot.tools.pro import render_launch_pack, render_product_readiness_audit
 from lilbot.utils.logging import StepLogger
 
 
@@ -54,6 +54,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  lilbot pricing\n"
             "  lilbot license status\n"
             "  lilbot pro audit .\n"
+            "  lilbot pro launch-pack . --output lilbot-launch-pack.md\n"
             "  lilbot\n"
             "  lilbot \"why is my system slow?\"\n"
             "  lilbot repo summarize .\n"
@@ -398,8 +399,16 @@ def _run_license_command(parts: list[str]) -> str:
 
 def _run_pro_command(parts: list[str], config: LilbotConfig) -> str:
     parser = argparse.ArgumentParser(prog="lilbot pro")
-    parser.add_argument("action", choices=("audit",))
-    parser.add_argument("path", nargs="?", default=".")
+    subparsers = parser.add_subparsers(dest="action", required=True)
+
+    audit_parser = subparsers.add_parser("audit")
+    audit_parser.add_argument("path", nargs="?", default=".")
+
+    launch_pack_parser = subparsers.add_parser("launch-pack")
+    launch_pack_parser.add_argument("path", nargs="?", default=".")
+    launch_pack_parser.add_argument("--output", default=None)
+    launch_pack_parser.add_argument("--force", action="store_true")
+
     parsed = parser.parse_args(parts)
 
     status = load_license_status()
@@ -407,6 +416,21 @@ def _run_pro_command(parts: list[str], config: LilbotConfig) -> str:
         return render_upgrade_required("Product readiness audit", status)
     if parsed.action == "audit":
         return render_product_readiness_audit(config, parsed.path)
+    if parsed.action == "launch-pack":
+        content = render_launch_pack(config, parsed.path)
+        if parsed.output:
+            output_path = config.resolve_workspace_path(parsed.output, must_exist=False)
+            if output_path.exists() and not parsed.force:
+                raise RuntimeError(
+                    f"{config.display_path(output_path)} already exists. Pass --force to overwrite it."
+                )
+            try:
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                output_path.write_text(content + "\n", encoding="utf-8")
+            except OSError as exc:
+                raise RuntimeError(f"Could not write launch pack to {output_path}: {exc}") from exc
+            return f"Wrote Lilbot Pro launch pack to {config.display_path(output_path)}"
+        return content
     raise SystemExit(f"Unsupported pro action: {parsed.action}")
 
 

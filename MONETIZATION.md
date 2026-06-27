@@ -24,6 +24,7 @@ lilbot license activate <license-key>
 ```bash
 lilbot license status
 lilbot pro audit .
+lilbot pro launch-pack . --output lilbot-launch-pack.md
 ```
 
 ## First Paid Workflow
@@ -41,6 +42,8 @@ lilbot pro audit .
 - safety messaging
 
 The command returns a score, findings, launch priorities, and a revenue path.
+
+`lilbot pro launch-pack . --output lilbot-launch-pack.md` turns the same scan into a customer-ready Markdown dossier with checkout copy, a demo script, a fulfillment email, a 48-hour launch plan, and a risk register.
 
 ## Fulfillment Notes
 

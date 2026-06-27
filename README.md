@@ -17,6 +17,7 @@ The first paid workflow is:
 lilbot pricing
 lilbot license activate <license-key>
 lilbot pro audit .
+lilbot pro launch-pack . --output lilbot-launch-pack.md
 ```
 
 Set `LILBOT_CHECKOUT_URL` to your Stripe Payment Link, Gumroad product, Lemon Squeezy checkout, Paddle checkout, or billing page before shipping a paid release.
@@ -74,6 +75,7 @@ lilbot repo trace-function authenticate_user .
 lilbot logs analyze /var/log/syslog
 lilbot explain-command "tar -czf backup.tar.gz project/"
 lilbot pro audit .
+lilbot pro launch-pack . --output lilbot-launch-pack.md
 ```
 
 ## Pricing and Pro
@@ -90,9 +92,12 @@ Free users keep the existing local assistant, deterministic repo tools, diagnost
 
 ```bash
 lilbot pro audit .
+lilbot pro launch-pack . --output lilbot-launch-pack.md
 ```
 
 The Pro audit checks for buyer-facing positioning, packaging metadata, onboarding, tests, release assets, checkout/licensing surfaces, support readiness, config hygiene, and safety messaging. It returns a score, findings, launch priorities, and a revenue path.
+
+The Pro launch pack turns the same scan into a customer-ready Markdown dossier with an executive summary, paid offer, launch priorities, findings table, demo script, checkout copy, fulfillment email, 48-hour launch plan, and risk register.
 
 ### Payment Setup
 

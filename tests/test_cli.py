@@ -239,3 +239,41 @@ class CliTests(unittest.TestCase):
                 main(["--workspace-root", str(workspace), "pro", "audit", "."])
 
         self.assertIn("available in Lilbot Pro", stdout.getvalue())
+
+    def test_pro_launch_pack_command_writes_markdown_for_pro_license(self) -> None:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with tempfile.TemporaryDirectory() as tempdir:
+            workspace = Path(tempdir) / "workspace"
+            workspace.mkdir()
+            (workspace / "README.md").write_text(
+                "# Launchable CLI\n\nA local-first CLI product for developers who need launch readiness.\n",
+                encoding="utf-8",
+            )
+            output_path = workspace / "launch-pack.md"
+            env = {
+                "LILBOT_LICENSE_PATH": str(Path(tempdir) / "license.json"),
+                "LILBOT_LICENSE_KEY": self._pro_key("LAUNCHBUYER2026"),
+            }
+            with (
+                patch.dict(os.environ, env, clear=True),
+                redirect_stdout(stdout),
+                redirect_stderr(stderr),
+            ):
+                main(
+                    [
+                        "--workspace-root",
+                        str(workspace),
+                        "pro",
+                        "launch-pack",
+                        ".",
+                        "--output",
+                        "launch-pack.md",
+                    ]
+                )
+
+            written = output_path.read_text(encoding="utf-8")
+
+        self.assertIn("Wrote Lilbot Pro launch pack", stdout.getvalue())
+        self.assertIn("# Launchable CLI Launch Pack", written)
+        self.assertIn("## Checkout Copy", written)
