@@ -12,14 +12,15 @@ Lilbot is packaged as an open-core CLI product.
 
 1. Create a Stripe Payment Link, Gumroad product, Lemon Squeezy checkout, Paddle checkout, or billing page for Lilbot Pro.
 2. Set `LILBOT_CHECKOUT_URL` to that checkout URL in release docs, support snippets, and managed deployments.
-3. Run `python scripts/issue_license.py` for each buyer or wire the same key format into your fulfillment system.
-4. Send the buyer their license key and activation command:
+3. Replace the placeholder checkout URL in `site/index.html` before publishing the static sales page.
+4. Run `python scripts/issue_license.py` for each buyer or wire the same key format into your fulfillment system.
+5. Send the buyer their license key and activation command:
 
 ```bash
 lilbot license activate <license-key>
 ```
 
-5. Ask the buyer to confirm access:
+6. Ask the buyer to confirm access:
 
 ```bash
 lilbot license status

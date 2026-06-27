@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lilbot Pro - Local AI launch audits for developer tools</title>
+    <meta
+      name="description"
+      content="Lilbot Pro turns local repository scans into launch priorities, checkout copy, fulfillment emails, and product-readiness reports."
+    >
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Lilbot Pro home">Lilbot Pro</a>
+      <nav aria-label="Primary navigation">
+        <a href="#workflow">Workflow</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#proof">Proof</a>
+      </nav>
+      <a class="nav-cta" href="#pricing">Buy Pro</a>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="terminal-backdrop" aria-hidden="true">
+          <pre><span class="prompt">$</span> lilbot pro audit .
+Lilbot Pro product readiness audit for .:
+- tier: Pro
+- score: 90/100
+- scanned_files: 62
+
+Findings
+[PASS] Positioning: README.md has buyer-facing setup and product copy.
+[PASS] Packaging: Package metadata found in pyproject.toml.
+[PASS] Monetization: Payment or licensing signals found.
+[WARN] Release: Add CI plus a changelog or release script.
+
+Launch priorities
+1. Connect checkout to the live payment provider.
+2. Issue a test license and run activation smoke tests.
+3. Publish the pricing path and onboard the first buyers.
+
+Revenue path
+1. Create a Stripe Payment Link, Gumroad product, or billing page.
+2. Set LILBOT_CHECKOUT_URL.
+3. Deliver license keys after purchase.</pre>
+        </div>
+        <div class="hero-copy">
+          <p class="eyebrow">Local-first AI product audits</p>
+          <h1 id="hero-title">Lilbot Pro</h1>
+          <p class="lede">
+            Turn a developer-tool repository into a sellable launch package without sending source code to a hosted service.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#pricing">Buy Pro</a>
+            <a class="button secondary" href="#workflow">See Workflow</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="workflow" class="band">
+        <div class="section-head">
+          <p class="eyebrow">Workflow</p>
+          <h2>From repo scan to launch assets</h2>
+        </div>
+        <div class="workflow-grid">
+          <article>
+            <span class="step">01</span>
+            <h3>Audit Readiness</h3>
+            <p>Score packaging, onboarding, tests, release assets, support, checkout, licensing, and safety messaging.</p>
+            <code>lilbot pro audit .</code>
+          </article>
+          <article>
+            <span class="step">02</span>
+            <h3>Generate The Dossier</h3>
+            <p>Create an executive summary, findings table, checkout copy, fulfillment email, and 48-hour launch plan.</p>
+            <code>lilbot pro launch-pack .</code>
+          </article>
+          <article>
+            <span class="step">03</span>
+            <h3>Activate Buyers</h3>
+            <p>Issue local license keys after purchase and keep the product useful even when customer code stays offline.</p>
+            <code>lilbot license activate</code>
+          </article>
+        </div>
+      </section>
+
+      <section id="pricing" class="pricing-band">
+        <div class="section-head">
+          <p class="eyebrow">Pricing</p>
+          <h2>Start free. Charge for launch leverage.</h2>
+        </div>
+        <div class="pricing-grid">
+          <article class="price-card">
+            <h3>Free</h3>
+            <p class="price">$0</p>
+            <ul>
+              <li>Local chat with a configured model</li>
+              <li>Repository and log summaries</li>
+              <li>Shell-command explanations</li>
+              <li>Doctor and self-test diagnostics</li>
+            </ul>
+            <a class="button secondary" href="https://github.com/ImZackAdams/lilbot">Install Free</a>
+          </article>
+          <article class="price-card featured">
+            <h3>Pro</h3>
+            <p class="price">$19<span>/month</span></p>
+            <ul>
+              <li>Product-readiness audits</li>
+              <li>Launch-pack Markdown generation</li>
+              <li>Checkout and fulfillment copy</li>
+              <li>Local license activation</li>
+            </ul>
+            <a class="button primary" href="https://example.com/lilbot-pro-checkout">Buy Pro</a>
+          </article>
+        </div>
+      </section>
+
+      <section id="proof" class="band proof">
+        <div class="section-head">
+          <p class="eyebrow">Proof</p>
+          <h2>What the buyer gets</h2>
+        </div>
+        <div class="proof-layout">
+          <div>
+            <h3>A concrete product dossier</h3>
+            <p>
+              The Pro launch pack gives founders and maintainers the launch material they usually avoid writing:
+              offer framing, checkout copy, fulfillment email, risk register, and the next moves that matter.
+            </p>
+          </div>
+          <pre class="mini-terminal"><span class="prompt">$</span> lilbot pro launch-pack . --output lilbot-launch-pack.md
+Wrote Lilbot Pro launch pack to ./lilbot-launch-pack.md
+
+<span class="prompt">$</span> sed -n '1,12p' lilbot-launch-pack.md
+# Lilbot Launch Pack
+## Executive Summary
+## Paid Offer
+## Launch Priorities
+## Findings
+## Demo Script
+## Checkout Copy</pre>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Lilbot Pro</span>
+      <span>Local-first productization for developer tools.</span>
+    </footer>
+  </body>
+</html>

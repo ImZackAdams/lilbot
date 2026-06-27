@@ -118,6 +118,8 @@ License state is stored locally at `~/.config/lilbot/license.json` by default. O
 
 For the operator launch checklist and manual license fulfillment helper, see [MONETIZATION.md](/home/athena/Desktop/lilbot/MONETIZATION.md).
 
+The static sales page lives in [site/index.html](/home/athena/Desktop/lilbot/site/index.html). Replace the placeholder Pro checkout link with your live payment URL before publishing it.
+
 ## First Run Experience
 
 ### `lilbot init`
